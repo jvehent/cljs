@@ -42,18 +42,17 @@ the terms of any one of the MPL, the GPL or the LGPL.
 //
 //	import "github.com/jvehent/cljs"
 //	...
-//	// initialize resource with location of document
-//	resource := cljs.New(documentRoot)
+//	resource := cljs.New(request.URL.Path)
 //
-//	// add a link to the resource
-//	err = resource.AddLink(cljs.Link{
+//	// add a link
+//	err := resource.AddLink(cljs.Link{
 //		Rel:  "home",
 //		Href: request.URL.Path,
 //		Name: "home"})
 //
-//	// add an item, first define the data and links slices
-//	// then insert them as a new item
-//	itemdata := []cljs.Data{
+//	// add an item, first define the data and links slices,
+//	// then insert into the resource
+//	data := []cljs.Data{
 //		{
 //			Name:   "bob",
 //			Prompt: "bob's name",
@@ -67,33 +66,29 @@ the terms of any one of the MPL, the GPL or the LGPL.
 //			Name: "bob's details",
 //		},
 //	}
-//	err = resource.AddItem(cljs.Item{Href: "/api/bob", Data: itemdata, Links: links})
+//	err = resource.AddItem(cljs.Item{Href: "/api/bob", Data: data, Links: links})
+//	if err != nil {
+//		panic(err)
+//	}
 //
-//	// add a query, first define the data, then insert as new query
-//	querydata := []cljs.Data{{Name: "search", Value: ""}}
-//	err = resource.AddQuery(cljs.Query{
-//		"href":	  "/api/search/users",
-//		"rel":    "search",
-//		"prompt": "Enter user to search for",
-//		"data": querydata
-//		})
-//
-//
-//	// Error and Template use setters
-//	resource.SetError(cljs.Error{Message: "Something's bunked"})
-//
+//	// set a template
 //	templatedata := []cljs.Data{
 //		{Name: "email", Value: "", Prompt: "Someone's email"},
 //		{Name: "full-name", Value: "", Prompt: "Someone's full name"},
 //	}
 //	resource.SetTemplate(cljs.Template{Data: templatedata})
 //
+//	// set an error
+//	resource.SetError(cljs.Error{
+//		Code: "internal error code 273841",
+//		Message: "somethind went wrong"})
+//
 //	// generate a response body, ready to send as a HTTP response
 //	body, err := resource.Marshal()
 //
 //	responseWriter.Write(body)	// from net/http module
 //
-// Resource structure is pseudo Go:
+// Resource structure in pseudo Go:
 //
 //	Resource {
 //		Collection map[string]interface{} {
