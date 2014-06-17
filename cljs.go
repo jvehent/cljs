@@ -180,8 +180,19 @@ var ContentType = "application/vnd.collection+json"
 
 // Resource is a top-level document returned by an API
 type Resource struct {
-	Collection map[string]interface{} `json:"collection"`
+	Collection Collection `json:"collection"`
 	mutex      sync.Mutex
+}
+
+// Collection is a container for everything inside a resource
+type Collection struct {
+	Version  string   `json:"version"`
+	Href     string   `json:"href"`
+	Links    []Link   `json:"links,omitempty"`
+	Items    []Item   `json:"items,omitempty"`
+	Queries  []Query  `json:"queries,omitempty"`
+	Template Template `json:"template,omitempty"`
+	Error    Error    `json:"error,omitempty"`
 }
 
 // New initializes a Resource. It sets the version number. The location of the
@@ -189,9 +200,8 @@ type Resource struct {
 // should be set to the URL to the root of the API.
 func New(root string) *Resource {
 	var r Resource
-	r.Collection = make(map[string]interface{})
-	r.Collection["version"] = "1.0"
-	r.Collection["href"] = root
+	r.Collection.Version = "1.0"
+	r.Collection.Href = root
 	return &r
 }
 
@@ -214,68 +224,37 @@ func (r Resource) Marshal() (rj []byte, err error) {
 
 // Validate makes sure that the Resource conforms to the standard syntax
 func (r Resource) Validate() (err error) {
-	if _, ok := r.Collection["version"]; !ok {
-		return fmt.Errorf("version is missing. Must be '1.0'")
-	}
-	if r.Collection["version"] != "1.0" {
+	if r.Collection.Version != "1.0" {
 		return fmt.Errorf("wrong version. Must be '1.0'")
 	}
-
-	if _, ok := r.Collection["href"]; !ok {
-		return fmt.Errorf("document base 'href' is missing")
-	}
-	if r.Collection["href"] == "" {
+	if r.Collection.Href == "" {
 		return fmt.Errorf("'href' is empty. Must contains resource location")
 	}
-
-	if _, ok := r.Collection["links"]; ok {
-		var links []Link
-		links = r.Collection["links"].([]Link)
-		for i, link := range links {
-			err = link.Validate()
-			if err != nil {
-				return fmt.Errorf("failed to validate link %d: %v", i, err)
-			}
-		}
-	}
-
-	if _, ok := r.Collection["items"]; ok {
-		var items []Item
-		items = r.Collection["items"].([]Item)
-		for i, item := range items {
-			err = item.Validate()
-			if err != nil {
-				return fmt.Errorf("failed to validate item %d: %v", i, err)
-			}
-		}
-	}
-
-	if _, ok := r.Collection["queries"]; ok {
-		var queries []Query
-		queries = r.Collection["queries"].([]Query)
-		for i, query := range queries {
-			err = query.Validate()
-			if err != nil {
-				return fmt.Errorf("failed to validate query %d: %v", i, err)
-			}
-		}
-	}
-
-	if _, ok := r.Collection["template"]; ok {
-		template := r.Collection["template"].(Template)
-		err = template.Validate()
+	for i, link := range r.Collection.Links {
+		err = link.Validate()
 		if err != nil {
-			return fmt.Errorf("failed to validate template: %v", err)
+			return fmt.Errorf("failed to validate link %d: %v", i, err)
 		}
 	}
-
-	if _, ok := r.Collection["error"]; ok {
-		res_error := r.Collection["error"].(Error)
-		err = res_error.Validate()
+	for i, item := range r.Collection.Items {
+		err = item.Validate()
 		if err != nil {
-			return fmt.Errorf("failed to validate resource error: %v", err)
+			return fmt.Errorf("failed to validate item %d: %v", i, err)
 		}
 	}
-
+	for i, query := range r.Collection.Queries {
+		err = query.Validate()
+		if err != nil {
+			return fmt.Errorf("failed to validate query %d: %v", i, err)
+		}
+	}
+	err = r.Collection.Template.Validate()
+	if err != nil {
+		return fmt.Errorf("failed to validate template: %v", err)
+	}
+	err = r.Collection.Error.Validate()
+	if err != nil {
+		return fmt.Errorf("failed to validate resource error: %v", err)
+	}
 	return
 }

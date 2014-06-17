@@ -60,13 +60,11 @@ func (r *Resource) AddLink(link Link) (err error) {
 	}
 
 	// allocate in the resource if not exists
-	if _, ok := r.Collection["links"]; !ok {
-		r.Collection["links"] = make([]Link, 0)
-	}
+	r.Collection.Links = make([]Link, 0)
 	var tmplinks []Link
-	tmplinks = r.Collection["links"].([]Link)
+	tmplinks = r.Collection.Links
 	tmplinks = append(tmplinks, link)
-	r.Collection["links"] = tmplinks
+	r.Collection.Links = tmplinks
 	return
 }
 

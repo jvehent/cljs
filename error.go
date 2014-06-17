@@ -35,8 +35,6 @@ the terms of any one of the MPL, the GPL or the LGPL.
 
 package cljs
 
-import ()
-
 type Error struct {
 	Title   string `json:"title,omitempty"`
 	Code    string `json:"code,omitempty"`
@@ -48,6 +46,6 @@ func (res_err Error) Validate() (err error) {
 }
 
 func (r *Resource) SetError(res_err Error) (err error) {
-	r.Collection["error"] = res_err
+	r.Collection.Error = res_err
 	return
 }

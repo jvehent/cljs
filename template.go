@@ -54,6 +54,6 @@ func (template Template) Validate() (err error) {
 }
 
 func (r *Resource) SetTemplate(template Template) (err error) {
-	r.Collection["template"] = template
+	r.Collection.Template = template
 	return
 }
