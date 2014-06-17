@@ -58,9 +58,6 @@ func (r *Resource) AddLink(link Link) (err error) {
 	if err != nil {
 		return fmt.Errorf("link validation failed: %v", err)
 	}
-
-	// allocate in the resource if not exists
-	r.Collection.Links = make([]Link, 0)
 	var tmplinks []Link
 	tmplinks = r.Collection.Links
 	tmplinks = append(tmplinks, link)

@@ -50,8 +50,6 @@ type Item struct {
 func (r *Resource) AddItem(item Item) (err error) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
-	// allocation the items array
-	r.Collection.Items = make([]Item, 0)
 	var tmpitems []Item
 	tmpitems = r.Collection.Items
 	tmpitems = append(tmpitems, item)

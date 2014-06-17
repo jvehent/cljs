@@ -56,8 +56,6 @@ func (r *Resource) AddQuery(query Query) (err error) {
 	if err != nil {
 		return fmt.Errorf("failed to validate query: %v", err)
 	}
-	// allocate in the resource if not exist
-	r.Collection.Queries = make([]Query, 0)
 	var tmpqueries []Query
 	tmpqueries = r.Collection.Queries
 	tmpqueries = append(tmpqueries, query)
